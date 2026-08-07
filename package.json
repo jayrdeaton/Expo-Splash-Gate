@@ -1,0 +1,90 @@
+{
+  "name": "@rific/splash-gate",
+  "version": "0.1.0",
+  "description": "Name every async condition an Expo app's first screen depends on (theme, fonts, saved preferences, auth, ...) and hold the splash screen up until all of them report ready — instead of hand-rolling a fresh ad hoc gate per project",
+  "keywords": [
+    "expo",
+    "expo-splash-screen",
+    "splash-screen",
+    "app-loading",
+    "font-loading"
+  ],
+  "homepage": "https://github.com/jayrdeaton/Expo-Splash-Gate#readme",
+  "bugs": {
+    "url": "https://github.com/jayrdeaton/Expo-Splash-Gate/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayrdeaton/Expo-Splash-Gate.git"
+  },
+  "license": "MIT",
+  "author": "Jay Deaton",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "react-native": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/__tests__"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build:watch": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "fix": "eslint --fix",
+    "lint": "eslint",
+    "prepublishOnly": "npm run build",
+    "release": "git push --follow-tags",
+    "release:major": "npm version major && git push --follow-tags",
+    "release:minor": "npm version minor && git push --follow-tags",
+    "release:patch": "npm version patch && git push --follow-tags",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "typecheck": "tsc --noEmit",
+    "preversion": "npm run lint && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.0.0",
+    "@typescript-eslint/parser": "^8.59.3",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-package-json": "^1.0.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "expo-splash-screen": "^57.0.5",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "prettier": "^3.8.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.0.0",
+    "ts-jest": "^29.4.9",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3"
+  },
+  "peerDependencies": {
+    "expo-splash-screen": ">=0.30.0",
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
