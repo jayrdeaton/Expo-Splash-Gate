@@ -19,21 +19,20 @@ npm install @rific/splash-gate
 // screen actually depends on
 import { createSplashGate } from '@rific/splash-gate'
 
-export const { markReady, pendingGates } = createSplashGate(['theme', 'fonts', 'keyboardLayout'])
+export const { markReady, useReady, pendingGates } = createSplashGate(['theme', 'fonts', 'keyboardLayout'])
 ```
 
 ```tsx
 // Theme.tsx
 import * as SplashScreen from 'expo-splash-screen'
 import { useFonts } from 'expo-font'
-import { useMarkReadyWhen } from '@rific/splash-gate'
-import { markReady } from './splashGate'
+import { markReady, useReady } from './splashGate'
 
 SplashScreen.preventAutoHideAsync()
 
 export const Theme = ({ children }) => {
   const [fontsLoaded] = useFonts({ ... })
-  useMarkReadyWhen(markReady, 'fonts', fontsLoaded)
+  useReady('fonts', fontsLoaded)
 
   const onThemeReady = () => markReady('theme') // a one-shot callback, not a boolean — call directly
 
@@ -43,8 +42,7 @@ export const Theme = ({ children }) => {
 
 ```ts
 // KeyboardLayoutProvider.tsx
-import { useMarkReadyWhen } from '@rific/splash-gate'
-import { markReady } from './splashGate'
+import { useReady } from './splashGate'
 
 const [loaded, setLoaded] = useState(false)
 useEffect(() => {
@@ -53,7 +51,7 @@ useEffect(() => {
     setLoaded(true) // mark loaded whether or not a saved value was actually found
   })
 }, [])
-useMarkReadyWhen(markReady, 'keyboardLayout', loaded)
+useReady('keyboardLayout', loaded)
 ```
 
 The splash screen hides exactly once, the moment `theme`, `fonts`, and `keyboardLayout` have all reported ready — in whatever order they actually resolve.
@@ -64,11 +62,8 @@ The splash screen hides exactly once, the moment `theme`, `fonts`, and `keyboard
 
 Takes an array of gate names (typically `as const` for literal-type safety) and returns:
 
-- `markReady(gate)` — marks one gate ready. Safe to call more than once for the same gate, and safe in any order. Hides the splash screen exactly once, once every gate is ready.
+- `markReady(gate)` — marks one gate ready. Safe to call more than once for the same gate, and safe in any order. Hides the splash screen exactly once, once every gate is ready. For a gate that only resolves via a one-shot callback (a library's own `onReady` prop, a promise `.then`) — call this directly there.
+- `useReady(gate, ready)` — for a gate whose readiness is already a plain boolean (state from a hook like `useFonts`, or your own derived condition), marks it ready once `ready` becomes `true`. Bound to this gate instance — there's nothing to pass but the two things that actually vary at each call site.
 - `pendingGates()` — the gate names still outstanding, for a debug log during development.
 
 Call this once, at module scope — not inside a component body, or you'll get a fresh gate (and a fresh splash-hide race) on every render.
-
-### `useMarkReadyWhen(markReady, gate, ready)`
-
-For a gate whose readiness is already a plain boolean (state from a hook like `useFonts`, or your own derived condition) — marks it ready once `ready` becomes `true`. For a gate that only resolves via a one-shot callback (a library's own `onReady` prop, a promise `.then`), call `markReady` directly there instead.

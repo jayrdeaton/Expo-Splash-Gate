@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { createSplashGate } from '../splashGate'
@@ -76,6 +77,49 @@ describe('createSplashGate', () => {
     expect(hideAsync).not.toHaveBeenCalled()
 
     gate.markReady('theme')
+    expect(hideAsync).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useReady', () => {
+  beforeEach(() => {
+    hideAsync.mockClear()
+  })
+
+  it('does not mark the gate ready while the condition is false', () => {
+    const gate = createSplashGate(['theme', 'fonts'])
+    renderHook(() => gate.useReady('fonts', false))
+
+    expect(gate.pendingGates()).toContain('fonts')
+    expect(hideAsync).not.toHaveBeenCalled()
+  })
+
+  it('marks the gate ready once the condition becomes true, hiding once every gate is in', () => {
+    const gate = createSplashGate(['theme', 'fonts'])
+    const { rerender } = renderHook(({ ready }) => gate.useReady('fonts', ready), { initialProps: { ready: false } })
+    gate.markReady('theme')
+
+    expect(hideAsync).not.toHaveBeenCalled()
+
+    rerender({ ready: true })
+    expect(gate.pendingGates()).toEqual([])
+    expect(hideAsync).toHaveBeenCalledTimes(1)
+  })
+
+  it('marks the gate ready immediately if the condition starts out true', () => {
+    const gate = createSplashGate(['theme'])
+    renderHook(() => gate.useReady('theme', true))
+
+    expect(hideAsync).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call markReady again on an unrelated re-render once already satisfied', () => {
+    const gate = createSplashGate(['theme'])
+    const { rerender } = renderHook(({ ready }) => gate.useReady('theme', ready), { initialProps: { ready: true } })
+
+    expect(hideAsync).toHaveBeenCalledTimes(1)
+
+    rerender({ ready: true })
     expect(hideAsync).toHaveBeenCalledTimes(1)
   })
 })

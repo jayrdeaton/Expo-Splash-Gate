@@ -79,11 +79,6 @@
     "expo-splash-screen": ">=0.30.0",
     "react": ">=18.0.0"
   },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
-  },
   "publishConfig": {
     "access": "public"
   }
