@@ -1,5 +1,16 @@
 import * as SplashScreen from 'expo-splash-screen'
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
+
+export interface GateProps<T extends string> {
+  gate: T
+  ready: boolean
+  // Rendered in place of `children` while `ready` is false. Defaults to null — the common case is
+  // that whatever this wraps has nothing sensible to show until its data exists (see Gate below),
+  // and the splash screen is still up for that entire window anyway, so there's normally nothing
+  // to fill this with.
+  fallback?: ReactNode
+  children: ReactNode
+}
 
 export type SplashGate<T extends string> = {
   // Marks one named gate ready. Safe to call more than once for the same gate (a no-op after the
@@ -15,6 +26,14 @@ export type SplashGate<T extends string> = {
   // Gate names still outstanding, in no particular order. For a debug log or a "why is this still
   // up" check during development, not something app code should need to branch on.
   pendingGates: () => T[]
+  // useReady only defers when the splash screen *hides* — it says nothing about when your own
+  // children first *render*. A component that mounts a child whose state locks in on first render
+  // (a lazy useState(() => ...) initializer wrapping a loaded value, as most third-party providers
+  // do) can already be stuck on stale defaults by the time useReady's effect even runs, even though
+  // the gate itself reports in correctly and the splash stays up for the right duration. Gate
+  // closes that gap: it registers the gate (so the splash still waits on it) *and* withholds
+  // `children` until `ready` is true, in one call, so those two things can't drift apart.
+  Gate: (props: GateProps<T>) => ReactNode
 }
 
 // One named condition per thing your first screen actually depends on (a loaded theme, a loaded
@@ -25,7 +44,7 @@ export type SplashGate<T extends string> = {
 // until every named gate has reported in, then it hides itself exactly once, so nothing your
 // app's first screen shows can ever be caught mid-load, wrong-then-corrected, a beat behind the
 // rest.
-export function createSplashGate<T extends string>(gates: readonly T[]): SplashGate<T> {
+export function createGate<T extends string>(gates: readonly T[]): SplashGate<T> {
   const pending = new Set<T>(gates)
   let hidden = false
 
@@ -42,7 +61,7 @@ export function createSplashGate<T extends string>(gates: readonly T[]): SplashG
 
   const useReady = (gate: T, ready: boolean) => {
     // markReady isn't in this dep array. It's this closure's own stable reference (one per
-    // createSplashGate call), not a per-render value, so there's nothing to gain by re-running
+    // createGate call), not a per-render value, so there's nothing to gain by re-running
     // this effect if it somehow changed identity.
     useEffect(() => {
       if (ready) markReady(gate)
@@ -51,10 +70,15 @@ export function createSplashGate<T extends string>(gates: readonly T[]): SplashG
 
   const pendingGates = () => Array.from(pending)
 
+  const Gate = ({ gate, ready, fallback = null, children }: GateProps<T>) => {
+    useReady(gate, ready)
+    return ready ? children : fallback
+  }
+
   // Nothing to wait for (called with an empty list, or every gate was already satisfied some
   // other way). Hide right away instead of leaving the splash up forever with nothing left that
   // could ever call markReady again.
   tryHide()
 
-  return { markReady, useReady, pendingGates }
+  return { markReady, useReady, pendingGates, Gate }
 }
