@@ -1,6 +1,6 @@
 {
   "name": "@rific/splash-gate",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Name every async condition an Expo app's first screen depends on (theme, fonts, saved preferences, auth, ...) and hold the splash screen up until all of them report ready — instead of hand-rolling a fresh ad hoc gate per project",
   "keywords": [
     "expo",
