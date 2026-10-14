@@ -48,34 +48,34 @@ src/
 
 That's the whole library: one ~85-line source file plus a two-line re-export barrel. No config/constants files, no other internal modules.
 
-`createGate<T>(gates)` seeds a `Set<T>` of pending gate names. `markReady`/`useReady` delete from that set and call `tryHide`, which hides the splash screen exactly once, the moment the set is empty (including immediately, at call time, if `gates` was empty to begin with). `Gate` both registers a gate via `useReady` and withholds `children` until `ready` is true, in one call — see the doc comment on `SplashGate.Gate` in `splashGate.ts` for why `useReady` alone isn't enough to prevent a child's first-render state from locking in stale.
+`createGate<T>(gates)` seeds a `Set<T>` of pending gate names. `markReady`/`useReady` delete from that set and call `tryHide`, which hides the splash screen exactly once, the moment the set is empty (including immediately, at call time, if `gates` was empty to begin with). `Gate` both registers a gate via `useReady` and withholds `children` until `ready` is true, in one call - see the doc comment on `SplashGate.Gate` in `splashGate.ts` for why `useReady` alone isn't enough to prevent a child's first-render state from locking in stale.
 
 ## Public API
 
 From `src/index.ts`:
 
-- `createGate<T extends string>(gates: readonly T[]): SplashGate<T>` — call once, up front, with every gate name the app needs
-- `SplashGate<T>` (type) — the return shape: `markReady(gate)`, `useReady(gate, ready)`, `pendingGates(): T[]`, `Gate` (component)
-- `GateProps<T>` (type) — props for the `Gate` component: `gate`, `ready`, `fallback?`, `children`
+- `createGate<T extends string>(gates: readonly T[]): SplashGate<T>` - call once, up front, with every gate name the app needs
+- `SplashGate<T>` (type) - the return shape: `markReady(gate)`, `useReady(gate, ready)`, `pendingGates(): T[]`, `Gate` (component)
+- `GateProps<T>` (type) - props for the `Gate` component: `gate`, `ready`, `fallback?`, `children`
 
 ## Peer Dependencies
 
-- `expo-splash-screen` >=57.0.0 — required
-- `react` >=19.0.0 — required
+- `expo-splash-screen` >=57.0.0 - required
+- `react` >=19.0.0 - required
 
-Both are hard `peerDependencies`, no `peerDependenciesMeta` — nothing in this package degrades gracefully without them.
+Both are hard `peerDependencies`, no `peerDependenciesMeta` - nothing in this package degrades gracefully without them.
 
 ## Testing
 
 - Framework: Jest (`@infinitetoken/jest-config/react-native`), jsdom environment
 - Mock: `src/__mocks__/expo-splash-screen.ts`, wired via `jest.config.cjs`'s `moduleNameMapper` since `expo-splash-screen` is a peer dependency, not something jest's automatic `__mocks__`-sibling-directory convention would pick up on its own
 - 16 tests across 2 suites (`splashGate.test.ts`, `Gate.test.tsx`)
-- 100% statement/branch/function/line coverage on `splashGate.ts` (the only file coverage is collected on — `src/index.ts` is excluded by the shared jest-config's default `collectCoverageFrom`)
-- No `coverageThreshold` override — real coverage clears the fleet default (70/70/70/70) by a wide margin
+- 100% statement/branch/function/line coverage on `splashGate.ts` (the only file coverage is collected on - `src/index.ts` is excluded by the shared jest-config's default `collectCoverageFrom`)
+- No `coverageThreshold` override - real coverage clears the fleet default (70/70/70/70) by a wide margin
 
 ## Code Style
 
-Enforced by ESLint + Prettier — run `npm run lint` before finishing any task. `eslint.config.cjs` is a bare `module.exports = require('@infinitetoken/eslint-config/react-native')` — no local rule overrides.
+Enforced by ESLint + Prettier - run `npm run lint` before finishing any task. `eslint.config.cjs` is a bare `module.exports = require('@infinitetoken/eslint-config/react-native')` - no local rule overrides.
 
 **Prettier config** (`@infinitetoken/eslint-config/prettier`):
 - Single quotes, JSX single quotes
@@ -84,12 +84,12 @@ Enforced by ESLint + Prettier — run `npm run lint` before finishing any task. 
 - Print width: 1000 (effectively disabled)
 
 **ESLint rules** (from the shared `react-native` preset, warnings unless noted):
-- `simple-import-sort` — imports and exports must be sorted
-- `react-native/no-inline-styles` — no inline style objects
-- `react-native/no-unused-styles` — no unused StyleSheet entries
-- `no-console` — no console statements
-- `@typescript-eslint/no-unused-vars` — `^_`-prefixed vars/args/caught-errors are ignored
-- `@typescript-eslint/no-explicit-any` — off inside `__tests__`/`__mocks__`
-- `react-hooks/rules-of-hooks` — error, not a warning
+- `simple-import-sort` - imports and exports must be sorted
+- `react-native/no-inline-styles` - no inline style objects
+- `react-native/no-unused-styles` - no unused StyleSheet entries
+- `no-console` - no console statements
+- `@typescript-eslint/no-unused-vars` - `^_`-prefixed vars/args/caught-errors are ignored
+- `@typescript-eslint/no-explicit-any` - off inside `__tests__`/`__mocks__`
+- `react-hooks/rules-of-hooks` - error, not a warning
 - `react-hooks/exhaustive-deps`, `react-hooks/refs`, `react-hooks/immutability`, `react-hooks/preserve-manual-memoization`, `react-hooks/set-state-in-effect`
-- `package-json/order-properties`, `package-json/sort-collections` — on `package.json` itself
+- `package-json/order-properties`, `package-json/sort-collections` - on `package.json` itself

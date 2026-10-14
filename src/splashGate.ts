@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from 'react'
 export interface GateProps<T extends string> {
   gate: T
   ready: boolean
-  // Rendered in place of `children` while `ready` is false. Defaults to null — the common case is
+  // Rendered in place of `children` while `ready` is false. Defaults to null - the common case is
   // that whatever this wraps has nothing sensible to show until its data exists (see Gate below),
   // and the splash screen is still up for that entire window anyway, so there's normally nothing
   // to fill this with.
@@ -26,7 +26,7 @@ export type SplashGate<T extends string> = {
   // Gate names still outstanding, in no particular order. For a debug log or a "why is this still
   // up" check during development, not something app code should need to branch on.
   pendingGates: () => T[]
-  // useReady only defers when the splash screen *hides* — it says nothing about when your own
+  // useReady only defers when the splash screen *hides* - it says nothing about when your own
   // children first *render*. A component that mounts a child whose state locks in on first render
   // (a lazy useState(() => ...) initializer wrapping a loaded value, as most third-party providers
   // do) can already be stuck on stale defaults by the time useReady's effect even runs, even though

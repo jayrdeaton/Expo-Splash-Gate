@@ -67,9 +67,9 @@ describe('Gate', () => {
     expect(screen.queryByText('theme content')).toBeNull()
   })
 
-  it('mounts children only once ready — a child whose state locks in on first render never sees a stale mount', () => {
+  it('mounts children only once ready - a child whose state locks in on first render never sees a stale mount', () => {
     // Stands in for a third-party provider whose internal state is a lazy useState(() => ...)
-    // initializer that only reads its prop on first mount — exactly the hazard Gate exists to
+    // initializer that only reads its prop on first mount - exactly the hazard Gate exists to
     // close (see splashGate.ts's own comment on Gate). If Gate rendered children immediately and
     // merely swapped the prop in later, this component would freeze on whatever `value` was at its
     // first render, same as the bug this primitive fixes.
