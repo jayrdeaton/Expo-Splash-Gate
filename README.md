@@ -2,6 +2,8 @@
 
 Name every async condition your Expo app's first screen actually depends on (a loaded theme, a loaded icon font, a hydrated saved preference, an auth check) and hold the splash screen up until all of them report ready. One shared, tested utility instead of a fresh ad hoc module-scope gate copy-pasted into every project.
 
+**[Live demo](https://rific.jaydeaton.com/demos/splash-gate)**
+
 ## Why
 
 `SplashScreen.preventAutoHideAsync()` only holds the splash up. It's on you to call `hideAsync()` at the right moment. Call it too early (e.g. the instant your theme loads) and anything else your first screen depends on but forgot to wait for, an icon font, a hydrated preference, pops in visibly a moment after the splash lifts. `createGate` makes every condition explicit up front, so nothing can be forgotten silently.
